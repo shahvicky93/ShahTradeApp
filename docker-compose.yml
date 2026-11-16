@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: book_keeping_app
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    environment:
+      - SUPABASE_DB_URL=${SUPABASE_DB_URL:-jdbc:postgresql://aws-0-eu-west-1.pooler.supabase.com:5432/postgres?currentSchema=app&sslmode=require}
+      - SUPABASE_DB_USER=${SUPABASE_DB_USER:-postgres.oglhvyszhokkvjrrcolu}
+      - SUPABASE_DB_PASSWORD=${SUPABASE_DB_PASSWORD:-unai_analytic_db}

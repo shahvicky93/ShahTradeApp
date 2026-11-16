@@ -1,0 +1,200 @@
+{
+  "info": {
+    "name": "Agricultural Trading Bookkeeping API",
+    "description": "Production API endpoints for Agricultural Trading, Inventory, and Ledger Management with Supabase PostgreSQL.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "basic",
+    "basic": [
+      {
+        "key": "username",
+        "value": "admin",
+        "type": "string"
+      },
+      {
+        "key": "password",
+        "value": "admin123",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080/api",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Master Data",
+      "item": [
+        {
+          "name": "Create User",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"user1\",\n  \"role\": \"USER\"\n}"
+            },
+            "url": {"raw": "{{baseUrl}}/users", "host": ["{{baseUrl}}"], "path": ["users"]}
+          }
+        },
+        {
+          "name": "List Users",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{baseUrl}}/users", "host": ["{{baseUrl}}"], "path": ["users"]}
+          }
+        },
+        {
+          "name": "Create Item (Rice)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Rice\",\n  \"unit\": \"KG\"\n}"
+            },
+            "url": {"raw": "{{baseUrl}}/items", "host": ["{{baseUrl}}"], "path": ["items"]}
+          }
+        },
+        {
+          "name": "List Items",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{baseUrl}}/items", "host": ["{{baseUrl}}"], "path": ["items"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Transactions",
+      "item": [
+        {
+          "name": "Record Fund (Capital Injection)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": 1,\n  \"amount\": 500000.00,\n  \"description\": \"Initial working capital\"\n}"
+            },
+            "url": {"raw": "{{baseUrl}}/transactions/fund", "host": ["{{baseUrl}}"], "path": ["transactions", "fund"]}
+          }
+        },
+        {
+          "name": "Record Debit (Buying with Tare Cut)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"itemId\": 1,\n  \"userId\": 2,\n  \"grossQty\": 500.00,\n  \"tareWeight\": 5.00,\n  \"ratePerUnit\": 35.00,\n  \"description\": \"500kg Rice bought with 5kg tare cut\"\n}"
+            },
+            "url": {"raw": "{{baseUrl}}/transactions/debit", "host": ["{{baseUrl}}"], "path": ["transactions", "debit"]}
+          }
+        },
+        {
+          "name": "Record Credit (Selling - Fully Paid)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dealerName\": \"Sharma Traders\",\n  \"itemId\": 1,\n  \"userId\": 3,\n  \"grossQty\": 205.00,\n  \"netQty\": 200.00,\n  \"ratePerUnit\": 42.00,\n  \"loadingCost\": 150.00,\n  \"carrierCharges\": 300.00,\n  \"paymentStatus\": \"FULLY_PAID\",\n  \"description\": \"200kg Rice sold with loading & transport\"\n}"
+            },
+            "url": {"raw": "{{baseUrl}}/transactions/credit", "host": ["{{baseUrl}}"], "path": ["transactions", "credit"]}
+          }
+        },
+        {
+          "name": "Record Credit (Selling - Pending)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dealerName\": \"Gupta & Sons\",\n  \"itemId\": 1,\n  \"userId\": 3,\n  \"grossQty\": 102.00,\n  \"netQty\": 100.00,\n  \"ratePerUnit\": 43.00,\n  \"loadingCost\": 100.00,\n  \"carrierCharges\": 200.00,\n  \"paymentStatus\": \"PENDING\",\n  \"description\": \"100kg Rice sold on credit\"\n}"
+            },
+            "url": {"raw": "{{baseUrl}}/transactions/credit", "host": ["{{baseUrl}}"], "path": ["transactions", "credit"]}
+          }
+        },
+        {
+          "name": "Record Expense (Delivery Cost)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": 1,\n  \"expenseCategory\": \"DELIVERY_COST\",\n  \"amount\": 2500.00,\n  \"description\": \"Inter-mandi truck freight\"\n}"
+            },
+            "url": {"raw": "{{baseUrl}}/transactions/expense", "host": ["{{baseUrl}}"], "path": ["transactions", "expense"]}
+          }
+        },
+        {
+          "name": "List All Transactions",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{baseUrl}}/transactions", "host": ["{{baseUrl}}"], "path": ["transactions"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Reports",
+      "item": [
+        {
+          "name": "Daily Report (Opening & Closing Balance)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/reports/daily?date=2026-10-29",
+              "host": ["{{baseUrl}}"],
+              "path": ["reports", "daily"],
+              "query": [{"key": "date", "value": "2026-10-29"}]
+            }
+          }
+        },
+        {
+          "name": "Profit Report (Settled Bills)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/reports/profit?startDate=2026-10-01&endDate=2026-10-31",
+              "host": ["{{baseUrl}}"],
+              "path": ["reports", "profit"],
+              "query": [
+                {"key": "startDate", "value": "2026-10-01"},
+                {"key": "endDate", "value": "2026-10-31"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Pending Funds Report (Dealer Receivables)",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{baseUrl}}/reports/pending-funds", "host": ["{{baseUrl}}"], "path": ["reports", "pending-funds"]}
+          }
+        },
+        {
+          "name": "Expense Report (Category Aggregation)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/reports/expenses?startDate=2026-10-01&endDate=2026-10-31",
+              "host": ["{{baseUrl}}"],
+              "path": ["reports", "expenses"],
+              "query": [
+                {"key": "startDate", "value": "2026-10-01"},
+                {"key": "endDate", "value": "2026-10-31"}
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
