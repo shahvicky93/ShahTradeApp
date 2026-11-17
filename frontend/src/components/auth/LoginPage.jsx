@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useUser } from '../../context/UserContext';
 import { useToast } from '../../context/ToastContext';
-import { PRESET_USERS } from '../../utils/constants';
 import {
   Sprout,
   Lock,
@@ -21,8 +20,8 @@ export function LoginPage() {
   const { login, authError } = useUser();
   const { showToast } = useToast();
 
-  const [username, setUsername] = useState('admin');
-  const [password, setPassword] = useState('admin123');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState(authError || '');
@@ -44,12 +43,6 @@ export function LoginPage() {
     } finally {
       setSubmitting(false);
     }
-  };
-
-  const handleQuickPreset = (preset) => {
-    setUsername(preset.username);
-    setPassword(preset.defaultPass);
-    setErrorMessage('');
   };
 
   return (
@@ -189,32 +182,7 @@ export function LoginPage() {
               </div>
             </div>
 
-            {/* Quick-Access Profiles */}
-            <div className="pt-2">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1.5">
-                Quick 1-Click Fill:
-              </span>
-              <div className="grid grid-cols-4 gap-2">
-                {PRESET_USERS.map((preset) => {
-                  const isSelected = username === preset.username;
-                  return (
-                    <button
-                      type="button"
-                      key={preset.username}
-                      onClick={() => handleQuickPreset(preset)}
-                      className={`py-1.5 px-2 text-xs font-semibold rounded-xl border text-center transition flex flex-col items-center gap-0.5 ${
-                        isSelected
-                          ? 'bg-emerald-50 border-emerald-500 text-emerald-900 shadow-sm'
-                          : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
-                      }`}
-                    >
-                      <span className="font-bold">{preset.username}</span>
-                      <span className="text-[9px] text-slate-400 font-mono">{preset.role}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
+            {/* Quick-Access Profiles removed */}
 
             <button
               type="submit"
