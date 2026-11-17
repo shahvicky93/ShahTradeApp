@@ -13,6 +13,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.HashMap;
@@ -28,6 +30,7 @@ public class AuthController {
 
     private final UserRepository userRepository;
     private final AuthenticationManager authenticationManager;
+    private final PasswordEncoder passwordEncoder;
 
     /**
      * Authenticates credentials and returns user details along with basic auth token.
@@ -70,6 +73,68 @@ public class AuthController {
         response.put("id", user.getId());
         response.put("username", user.getUsername());
         response.put("role", user.getRole());
+        response.put("createdAt", user.getCreatedAt());
+
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Updates the current user's username and/or password.
+     * Requires current password to authorize the change.
+     */
+    @PutMapping("/me")
+    public ResponseEntity<Map<String, Object>> updateProfile(
+            @RequestBody Map<String, String> body,
+            Authentication authentication) {
+
+        String currentUsername = authentication.getName();
+        AppUser user = userRepository.findByUsername(currentUsername)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + currentUsername));
+
+        String currentPassword = body.get("currentPassword");
+        if (currentPassword == null || currentPassword.isBlank()) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Current password is required."));
+        }
+        if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+            return ResponseEntity.status(403).body(Map.of("message", "Current password is incorrect."));
+        }
+
+        String newUsername = body.get("newUsername");
+        String newPassword = body.get("newPassword");
+
+        boolean changed = false;
+
+        if (newUsername != null && !newUsername.isBlank() && !newUsername.equals(currentUsername)) {
+            if (userRepository.findByUsername(newUsername).isPresent()) {
+                return ResponseEntity.badRequest().body(Map.of("message", "Username already taken."));
+            }
+            user.setUsername(newUsername);
+            changed = true;
+        }
+
+        String resolvedPassword = currentPassword;
+        if (newPassword != null && !newPassword.isBlank()) {
+            user.setPassword(passwordEncoder.encode(newPassword));
+            resolvedPassword = newPassword;
+            changed = true;
+        }
+
+        if (!changed) {
+            return ResponseEntity.badRequest().body(Map.of("message", "No changes provided."));
+        }
+
+        userRepository.save(user);
+
+        // Return new token so client can re-authenticate without logout
+        String newToken = Base64.getEncoder().encodeToString(
+                (user.getUsername() + ":" + resolvedPassword).getBytes(StandardCharsets.UTF_8)
+        );
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("id", user.getId());
+        response.put("username", user.getUsername());
+        response.put("role", user.getRole());
+        response.put("token", newToken);
         response.put("createdAt", user.getCreatedAt());
 
         return ResponseEntity.ok(response);

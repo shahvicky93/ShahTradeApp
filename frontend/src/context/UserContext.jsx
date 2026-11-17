@@ -86,6 +86,7 @@ export function UserProvider({ children }) {
     <UserContext.Provider
       value={{
         currentUser,
+        setCurrentUser,
         users,
         items,
         loading,

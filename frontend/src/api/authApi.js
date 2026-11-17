@@ -27,4 +27,18 @@ export const authApi = {
   logout() {
     clearAuthCredentials();
   },
+
+  /**
+   * Updates the current user's username and/or password.
+   * Returns updated user + new token so session stays alive.
+   */
+  async updateProfile({ currentPassword, newUsername, newPassword }) {
+    const response = await apiClient.put('/auth/me', { currentPassword, newUsername, newPassword });
+    const user = response.data;
+    // Update stored credentials with new username/password
+    const resolvedUser = user.username;
+    const resolvedPass = newPassword || currentPassword;
+    setAuthCredentials(resolvedUser, resolvedPass, user.token);
+    return user;
+  },
 };

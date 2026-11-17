@@ -11,15 +11,18 @@ import {
   Receipt,
   Wallet,
   LogOut,
-  User,
   Shield,
+  UserCog,
 } from 'lucide-react';
+import { ProfileModal } from '../auth/ProfileModal';
 
 export function Navbar({ activeTab, setActiveTab, onOpenActionModal }) {
   const { currentUser, logout } = useUser();
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  const [profileModalOpen, setProfileModalOpen] = useState(false);
 
   return (
+    <>
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200">
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 gap-2">
@@ -172,6 +175,16 @@ export function Navbar({ activeTab, setActiveTab, onOpenActionModal }) {
                     <button
                       onClick={() => {
                         setUserDropdownOpen(false);
+                        setProfileModalOpen(true);
+                      }}
+                      className="w-full text-left px-4 py-2.5 text-xs flex items-center gap-2 text-slate-700 hover:bg-slate-50 font-semibold transition"
+                    >
+                      <UserCog className="w-4 h-4 text-slate-500" />
+                      Edit Profile
+                    </button>
+                    <button
+                      onClick={() => {
+                        setUserDropdownOpen(false);
                         logout();
                       }}
                       className="w-full text-left px-4 py-2.5 text-xs flex items-center gap-2 text-rose-600 hover:bg-rose-50 font-semibold transition"
@@ -221,5 +234,8 @@ export function Navbar({ activeTab, setActiveTab, onOpenActionModal }) {
         </div>
       </div>
     </header>
+
+    <ProfileModal isOpen={profileModalOpen} onClose={() => setProfileModalOpen(false)} />
+    </>
   );
 }
